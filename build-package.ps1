@@ -1,40 +1,40 @@
 Set-StrictMode -Version Latest
 $script:PACKAGE_FOLDER = "$env:APPVEYOR_BUILD_FOLDER"
 Set-Location $script:PACKAGE_FOLDER
-$script:ATOM_CHANNEL = "stable"
-$script:ATOM_DIRECTORY_NAME = "Atom"
-if ($env:ATOM_CHANNEL -and ($env:ATOM_CHANNEL.tolower() -ne "stable")) {
-    $script:ATOM_CHANNEL = "$env:ATOM_CHANNEL"
-    $script:ATOM_DIRECTORY_NAME = "$script:ATOM_DIRECTORY_NAME "
-    $script:ATOM_DIRECTORY_NAME += $script:ATOM_CHANNEL.substring(0,1).toupper()
-    $script:ATOM_DIRECTORY_NAME += $script:ATOM_CHANNEL.substring(1).tolower()
+$script:SOLDAT_CHANNEL = "stable"
+$script:SOLDAT_DIRECTORY_NAME = "Soldat"
+if ($env:SOLDAT_CHANNEL -and ($env:SOLDAT_CHANNEL.tolower() -ne "stable")) {
+    $script:SOLDAT_CHANNEL = "$env:SOLDAT_CHANNEL"
+    $script:SOLDAT_DIRECTORY_NAME = "$script:SOLDAT_DIRECTORY_NAME "
+    $script:SOLDAT_DIRECTORY_NAME += $script:SOLDAT_CHANNEL.substring(0,1).toupper()
+    $script:SOLDAT_DIRECTORY_NAME += $script:SOLDAT_CHANNEL.substring(1).tolower()
 }
 
-$script:ATOM_EXE_PATH = "$script:PACKAGE_FOLDER\$script:ATOM_DIRECTORY_NAME\atom.exe"
-$script:ATOM_SCRIPT_PATH = "$script:PACKAGE_FOLDER\$script:ATOM_DIRECTORY_NAME\resources\cli\atom.cmd"
-$script:APM_SCRIPT_PATH = "$script:PACKAGE_FOLDER\$script:ATOM_DIRECTORY_NAME\resources\app\apm\bin\apm.cmd"
-$script:NPM_SCRIPT_PATH = "$script:PACKAGE_FOLDER\$script:ATOM_DIRECTORY_NAME\resources\app\apm\node_modules\.bin\npm.cmd"
+$script:SOLDAT_EXE_PATH = "$script:PACKAGE_FOLDER\$script:SOLDAT_DIRECTORY_NAME\soldat.exe"
+$script:SOLDAT_SCRIPT_PATH = "$script:PACKAGE_FOLDER\$script:SOLDAT_DIRECTORY_NAME\resources\cli\soldat.cmd"
+$script:RECRUE_SCRIPT_PATH = "$script:PACKAGE_FOLDER\$script:SOLDAT_DIRECTORY_NAME\resources\app\recrue\bin\recrue.cmd"
+$script:NPM_SCRIPT_PATH = "$script:PACKAGE_FOLDER\$script:SOLDAT_DIRECTORY_NAME\resources\app\recrue\node_modules\.bin\npm.cmd"
 
-if ($env:ATOM_LINT_WITH_BUNDLED_NODE -eq "false") {
-  $script:ATOM_LINT_WITH_BUNDLED_NODE = $FALSE
+if ($env:SOLDAT_LINT_WITH_BUNDLED_NODE -eq "false") {
+  $script:SOLDAT_LINT_WITH_BUNDLED_NODE = $FALSE
   $script:NPM_SCRIPT_PATH = "npm"
 } else {
-  $script:ATOM_LINT_WITH_BUNDLED_NODE = $TRUE
+  $script:SOLDAT_LINT_WITH_BUNDLED_NODE = $TRUE
 }
 
-function DownloadAtom() {
-    Write-Host "Downloading latest Atom release..."
-    $source = "https://atom.io/download/windows_zip?channel=$script:ATOM_CHANNEL"
-    $destination = "$script:PACKAGE_FOLDER\atom.zip"
+function DownloadSoldat() {
+    Write-Host "Downloading latest Soldat release..."
+    $source = "https://soldat.tv/download/windows_zip?channel=$script:SOLDAT_CHANNEL"
+    $destination = "$script:PACKAGE_FOLDER\soldat.zip"
     appveyor DownloadFile $source -FileName $destination
     if ($LASTEXITCODE -ne 0) {
         ExitWithCode -exitcode $LASTEXITCODE
     }
 }
 
-function ExtractAtom() {
-    Remove-Item "$script:PACKAGE_FOLDER\$script:ATOM_DIRECTORY_NAME" -Recurse -ErrorAction Ignore
-    Unzip "$script:PACKAGE_FOLDER\atom.zip" "$script:PACKAGE_FOLDER"
+function ExtractSoldat() {
+    Remove-Item "$script:PACKAGE_FOLDER\$script:SOLDAT_DIRECTORY_NAME" -Recurse -ErrorAction Ignore
+    Unzip "$script:PACKAGE_FOLDER\soldat.zip" "$script:PACKAGE_FOLDER"
 }
 
 Add-Type -AssemblyName System.IO.Compression.FileSystem
@@ -46,14 +46,14 @@ function Unzip
 }
 
 function PrintVersions() {
-    Write-Host -NoNewLine "Using Atom version: "
-    $atomVer = & "$script:ATOM_EXE_PATH" --version | Out-String
+    Write-Host -NoNewLine "Using Soldat version: "
+    $soldatVer = & "$script:SOLDAT_EXE_PATH" --version | Out-String
     if ($LASTEXITCODE -ne 0) {
         ExitWithCode -exitcode $LASTEXITCODE
     }
-    Write-Host $atomVer
-    Write-Host "Using APM version: "
-    & "$script:APM_SCRIPT_PATH" -v
+    Write-Host $soldatVer
+    Write-Host "Using RECRUE version: "
+    & "$script:RECRUE_SCRIPT_PATH" -v
     if ($LASTEXITCODE -ne 0) {
         ExitWithCode -exitcode $LASTEXITCODE
     }
@@ -61,18 +61,18 @@ function PrintVersions() {
 
 function InstallPackage() {
     Write-Host "Downloading package dependencies..."
-    & "$script:APM_SCRIPT_PATH" clean
+    & "$script:RECRUE_SCRIPT_PATH" clean
     if ($LASTEXITCODE -ne 0) {
         ExitWithCode -exitcode $LASTEXITCODE
     }
-    if ($script:ATOM_LINT_WITH_BUNDLED_NODE -eq $TRUE) {
-      & "$script:APM_SCRIPT_PATH" install
-      # Set the PATH to include the node.exe bundled with APM
-      $newPath = "$script:PACKAGE_FOLDER\$script:ATOM_DIRECTORY_NAME\resources\app\apm\bin;$env:PATH"
+    if ($script:SOLDAT_LINT_WITH_BUNDLED_NODE -eq $TRUE) {
+      & "$script:RECRUE_SCRIPT_PATH" install
+      # Set the PATH to include the node.exe bundled with RECRUE
+      $newPath = "$script:PACKAGE_FOLDER\$script:SOLDAT_DIRECTORY_NAME\resources\app\recrue\bin;$env:PATH"
       $env:PATH = $newPath
       [Environment]::SetEnvironmentVariable("PATH", "$newPath", "User")
     } else {
-      & "$script:APM_SCRIPT_PATH" install --production
+      & "$script:RECRUE_SCRIPT_PATH" install --production
       if ($LASTEXITCODE -ne 0) {
           ExitWithCode -exitcode $LASTEXITCODE
       }
@@ -97,12 +97,12 @@ function InstallPackage() {
 }
 
 function InstallDependencies() {
-    if ($env:APM_TEST_PACKAGES) {
-        Write-Host "Installing atom package dependencies..."
-        $APM_TEST_PACKAGES = $env:APM_TEST_PACKAGES -split "\s+"
-        $APM_TEST_PACKAGES | foreach {
+    if ($env:RECRUE_TEST_PACKAGES) {
+        Write-Host "Installing soldat package dependencies..."
+        $RECRUE_TEST_PACKAGES = $env:RECRUE_TEST_PACKAGES -split "\s+"
+        $RECRUE_TEST_PACKAGES | foreach {
             Write-Host "$_"
-            & "$script:APM_SCRIPT_PATH" install $_
+            & "$script:RECRUE_SCRIPT_PATH" install $_
             if ($LASTEXITCODE -ne 0) {
                 ExitWithCode -exitcode $LASTEXITCODE
             }
@@ -221,9 +221,9 @@ function RunSpecs() {
     }
     Write-Host "Running specs..."
     if ($specpathexists) {
-      & "$script:ATOM_EXE_PATH" --test spec 2>&1 | %{ "$_" }
+      & "$script:SOLDAT_EXE_PATH" --test spec 2>&1 | %{ "$_" }
     } else {
-      & "$script:ATOM_EXE_PATH" --test test 2>&1 | %{ "$_" }
+      & "$script:SOLDAT_EXE_PATH" --test test 2>&1 | %{ "$_" }
     }
 
     if ($LASTEXITCODE -ne 0) {
@@ -252,8 +252,8 @@ function SetElectronEnvironmentVariables
 
 }
 
-DownloadAtom
-ExtractAtom
+DownloadSoldat
+ExtractSoldat
 SetElectronEnvironmentVariables
 PrintVersions
 InstallPackage

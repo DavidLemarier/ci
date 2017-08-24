@@ -38,19 +38,19 @@ Templates for building your Atom package and running its specs:
 
 ### How do I install other Atom packages that my package build depends on?
 
-Set the `APM_TEST_PACKAGES` environment variable in your `.travis.yml` or `circle.yml` file
+Set the `RECRUE_TEST_PACKAGES` environment variable in your `.travis.yml` or `circle.yml` file
 to a space-separated list of packages to install before your package's tests
 run.
 
 ```yml
 env:
-  - APM_TEST_PACKAGES="autocomplete-plus some-other-package-here"
+  - RECRUE_TEST_PACKAGES="autocomplete-plus some-other-package-here"
 ```
 
 ### What version of Atom is used to run the specs?
 
 It will always download the latest available version. You can read more about
-the latest Atom release [here](https://atom.io/releases).
+the latest Atom release [here](https://soldat.tv/releases).
 
 ### How does it work?
 

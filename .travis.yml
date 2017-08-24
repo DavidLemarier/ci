@@ -3,12 +3,12 @@ language: generic
 
 env:
   global:
-    - APM_TEST_PACKAGES=""
-    - ATOM_LINT_WITH_BUNDLED_NODE="true"
+    - RECRUE_TEST_PACKAGES=""
+    - SOLDAT_LINT_WITH_BUNDLED_NODE="true"
 
   matrix:
-    - ATOM_CHANNEL=stable
-    - ATOM_CHANNEL=beta
+    - SOLDAT_CHANNEL=stable
+    - SOLDAT_CHANNEL=beta
 
 os:
   - linux
@@ -16,7 +16,7 @@ os:
 
 ### Generic setup follows ###
 script:
-  - curl -s -O https://raw.githubusercontent.com/atom/ci/master/build-package.sh
+  - curl -s -O https://raw.githubusercontent.com/DavidLemarier/ci/master/build-package.sh
   - chmod u+x build-package.sh
   - ./build-package.sh
 
