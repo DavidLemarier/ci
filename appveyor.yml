@@ -1,11 +1,11 @@
 ### Project specific config ###
 environment:
   RECRUE_TEST_PACKAGES:
-  ATOM_LINT_WITH_BUNDLED_NODE: "true"
+  SOLDAT_LINT_WITH_BUNDLED_NODE: "true"
 
   matrix:
-  - ATOM_CHANNEL: stable
-  - ATOM_CHANNEL: beta
+  - SOLDAT_CHANNEL: stable
+  - SOLDAT_CHANNEL: beta
 
 ### Generic setup follows ###
 build_script:
